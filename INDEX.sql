@@ -1,0 +1,350 @@
+-- ============================================================
+-- INDEX.SQL — Master Query Reference
+-- Project: Sample Superstore Business Intelligence
+-- Description: Complete index of all SQL scripts in this
+--              project. Run scripts in order 01 through 08.
+--              This file is a reference only — do not run
+--              this file directly.
+-- ============================================================
+--
+-- ┌─────────────────────────────────────────────────────────┐
+-- │              EXECUTION ORDER                            │
+-- ├──────┬──────────────────────────────────────────────────┤
+-- │  01  │ 01_create_database.sql                           │
+-- │      │ Creates database, table, date columns            │
+-- ├──────┼──────────────────────────────────────────────────┤
+-- │  02  │ 02_data_cleaning.sql                             │
+-- │      │ NULL checks, duplicates, type fixes, strings     │
+-- ├──────┼──────────────────────────────────────────────────┤
+-- │  03  │ 03_eda_sales.sql                                 │
+-- │      │ Sales KPIs, trends, rankings, window functions   │
+-- ├──────┼──────────────────────────────────────────────────┤
+-- │  04  │ 04_eda_profit.sql                                │
+-- │      │ Profit KPIs, loss analysis, discount impact      │
+-- ├──────┼──────────────────────────────────────────────────┤
+-- │  05  │ 05_eda_segment_shipping.sql                      │
+-- │      │ Segment profiling, shipping analysis             │
+-- ├──────┼──────────────────────────────────────────────────┤
+-- │  06  │ 06_views.sql                                     │
+-- │      │ vw_master_eda, vw_region_performance,            │
+-- │      │ vw_subcat_profitability                          │
+-- ├──────┼──────────────────────────────────────────────────┤
+-- │  07  │ 07_stored_procedures.sql                         │
+-- │      │ usp_region_performance, usp_sales_by_region,     │
+-- │      │ usp_category_segment_analysis                    │
+-- ├──────┼──────────────────────────────────────────────────┤
+-- │  08  │ 08_indexes.sql                                   │
+-- │      │ Performance indexes on all key columns           │
+-- └──────┴──────────────────────────────────────────────────┘
+--
+-- ============================================================
+-- SCRIPT 01: 01_create_database.sql
+-- ============================================================
+--
+--   CREATE DATABASE superstore_db
+--   CREATE TABLE SampleSuperstore (13 columns)
+--   ALTER TABLE ADD Order_Date, Ship_Date
+--   UPDATE to populate dates (2020-2023)
+--   SELECT COUNT(*) to confirm 9,994 rows loaded
+--
+-- ============================================================
+-- SCRIPT 02: 02_data_cleaning.sql
+-- ============================================================
+--
+--   SECTION 1 — NULL DETECTION
+--     CASE WHEN IS NULL across all 13 columns
+--     UPDATE SET Profit = 0 WHERE Profit IS NULL
+--
+--   SECTION 2 — DUPLICATE REMOVAL
+--     ROW_NUMBER() OVER (PARTITION BY City, State,
+--     Category, Sales, Profit ORDER BY (SELECT NULL))
+--     DELETE FROM CTE WHERE row_num > 1
+--
+--   SECTION 3 — DISTINCT VALUE CHECKS
+--     SELECT DISTINCT Ship_Mode, Segment, Region,
+--     Category, Sub_Category
+--
+--   SECTION 4 — STRING CLEANING
+--     TRIM() on all text columns
+--     CONCAT(City, State) full location audit
+--     LEN() to detect corrupt values
+--
+--   SECTION 5 — DATA TYPE STANDARDISATION
+--     CAST(Sales AS INT)
+--     CAST(Discount AS DECIMAL(5,2))
+--     CAST(Profit AS DECIMAL(10,2))
+--
+--   SECTION 6 — CALCULATED COLUMNS
+--     Profit margin per order
+--     Profit status (Profitable / Loss / Break Even)
+--     Discount bucket (No Discount / Low / Medium /
+--     High / Extreme)
+--
+-- ============================================================
+-- SCRIPT 03: 03_eda_sales.sql
+-- ============================================================
+--
+--   SECTION 1 — OVERALL KPIs
+--     COUNT, SUM, AVG, MIN, MAX on Sales and Profit
+--     Overall profit margin %, avg discount %
+--
+--   SECTION 2 — SALES BY DIMENSION
+--     By Region, Category, Segment, Ship Mode
+--     Each with % of total using SUM() OVER()
+--
+--   SECTION 3 — TOP/BOTTOM STATES
+--     TOP 10 states by sales DESC
+--     TOP 10 states by sales ASC (bottom 10)
+--
+--   SECTION 4 — SUB-CATEGORY DEEP DIVE
+--     CTE with aggregated sub-category metrics
+--     RANK() OVER sales rank
+--     % of total and running total (ROWS BETWEEN
+--     UNBOUNDED PRECEDING AND CURRENT ROW)
+--
+--   SECTION 5 — MONTHLY TREND
+--     GROUP BY YEAR, MONTH with DATENAME(MONTH)
+--     total_orders, total_sales, total_profit, avg AOV
+--
+--   SECTION 6 — QUARTERLY BY REGION
+--     'Q' + CAST(DATEPART(QUARTER) AS VARCHAR)
+--     GROUP BY year, quarter, region
+--
+--   SECTION 7 — WINDOW FUNCTIONS
+--     RANK() OVER (PARTITION BY Category ORDER BY
+--     total_profit DESC) — profit rank within category
+--     DENSE_RANK() comparison
+--     % of total using SUM() OVER()
+--
+--   SECTION 8 — LAG / LEAD
+--     Monthly MoM growth %
+--     LAG(total_sales) OVER (ORDER BY year, month)
+--     LEAD(total_sales) for forward-looking
+--     MoM growth = (current - prev) / ABS(prev) * 100
+--
+--   SECTION 9 — NTILE / PERCENTILE
+--     NTILE(4) performance quartile buckets
+--     PERCENTILE_CONT(0.25/0.50/0.75) WITHIN GROUP
+--     OVER (PARTITION BY Category) — median vs avg
+--
+--   SECTION 10 — PIVOT
+--     Sales by Category across Regions (PIVOT)
+--     Quarterly sales by Region (PIVOT)
+--     CTE wrapper pattern for ROUND() outside PIVOT
+--
+-- ============================================================
+-- SCRIPT 04: 04_eda_profit.sql
+-- ============================================================
+--
+--   SECTION 1 — PROFIT KPIs
+--     total_profit, avg_profit_per_order
+--     worst_loss (MIN), best_profit (MAX)
+--     overall_margin_pct
+--     loss_orders, break_even_orders, profitable_orders
+--     loss_order_pct
+--
+--   SECTION 2 — PROFIT BY DIMENSION
+--     Region x Category with CASE WHEN profit status
+--     HAVING SUM(Profit) < 0 — loss sub-categories
+--     Full detail: sales, profit, discount, margin
+--
+--   SECTION 3 — DISCOUNT IMPACT (KEY INSIGHT)
+--     CASE WHEN discount buckets
+--     GROUP BY CASE WHEN
+--     avg_sales, avg_profit, total_profit, margin_pct
+--     Proves discount > 40% = negative margin
+--
+--   SECTION 4 — MONTHLY PROFIT TREND
+--     CTE monthly_profit
+--     LAG(total_profit) MoM growth with ABS() for
+--     correct % when prior month is negative
+--
+--   SECTION 5 — ABOVE AVERAGE STATES (CTE CHAIN)
+--     CTE state_sales -> CTE avg_sales
+--     CROSS JOIN to compare each state vs average
+--
+--   SECTION 6 — PROFIT PIVOT BY SEGMENT
+--     PIVOT on Segment IN (Consumer, Corporate,
+--     [Home Office]) per Region
+--
+-- ============================================================
+-- SCRIPT 05: 05_eda_segment_shipping.sql
+-- ============================================================
+--
+--   SECTION 1 — SEGMENT PROFILING
+--     All KPIs by Segment
+--     pct_of_total_sales using SUM() OVER()
+--     loss_orders count per segment
+--
+--   SECTION 2 — CROSS ANALYSIS
+--     Segment x Category x Region
+--     Full profit/margin/discount breakdown
+--     CASE WHEN profit status flag
+--
+--   SECTION 3 — SHIPPING MODE ANALYSIS
+--     All KPIs by Ship_Mode
+--     avg_ship_days using DATEDIFF(DAY,
+--     Order_Date, Ship_Date)
+--     min/max ship days
+--     pct_of_total_sales
+--
+--   SECTION 4 — SHIPPING PREFERENCE
+--     Segment x Region x Ship_Mode
+--     pct_of_segment_region using
+--     COUNT(*) / SUM(COUNT(*)) OVER
+--     (PARTITION BY Segment, Region)
+--
+--   SECTION 5 — SUBQUERIES
+--     WHERE Sales > (SELECT AVG(Sales) ...)
+--     Subquery in FROM — top 5 profitable states
+--     with profit_margin calculated inside
+--
+-- ============================================================
+-- SCRIPT 06: 06_views.sql
+-- ============================================================
+--
+--   VIEW 1: vw_region_performance
+--     Region-level KPI summary
+--     Used by Power BI — Region slicer and bar chart
+--     Columns: Region, total_orders, total_sales,
+--     total_profit, avg_discount, profit_margin_pct
+--
+--   VIEW 2: vw_subcat_profitability
+--     Sub-category profitability breakdown
+--     Used by Power BI — sub-cat visuals and table
+--     Columns: Category, Sub_Category, total_orders,
+--     total_sales, total_profit, avg_discount,
+--     profit_margin_pct, profit_status
+--
+--   VIEW 3: vw_master_eda (PRIMARY POWER BI SOURCE)
+--     CTE base -> outer SELECT with window functions
+--     All dimensions: Region, State, City, Segment,
+--     Category, Sub_Category, Ship_Mode, year,
+--     quarter, month, month_name
+--     All KPIs: orders, units, sales, profit, AOV,
+--     discount, margin, ship_days, loss_orders,
+--     profit_status
+--     Window: sales_rank, profit_rank,
+--     pct_of_total_sales, pct_of_total_profit
+--
+-- ============================================================
+-- SCRIPT 07: 07_stored_procedures.sql
+-- ============================================================
+--
+--   PROCEDURE 1: usp_region_performance
+--     No parameters
+--     Returns full region KPI breakdown
+--     EXEC usp_region_performance
+--
+--   PROCEDURE 2: usp_sales_by_region
+--     @Region VARCHAR(50)
+--     Returns State, City, Category, Sub_Category
+--     breakdown filtered to @Region
+--     EXEC usp_sales_by_region @Region = 'West'
+--
+--   PROCEDURE 3: usp_category_segment_analysis
+--     @Category VARCHAR(50)
+--     @Segment  VARCHAR(50)
+--     @TotalProfit DECIMAL(12,2) OUTPUT
+--     Returns sub-category x ship mode breakdown
+--     Returns total profit via OUTPUT parameter
+--     DECLARE @profit DECIMAL(12,2)
+--     EXEC usp_category_segment_analysis
+--       @Category = 'Technology',
+--       @Segment = 'Consumer',
+--       @TotalProfit = @profit OUTPUT
+--     SELECT @profit AS total_profit_returned
+--
+-- ============================================================
+-- SCRIPT 08: 08_indexes.sql
+-- ============================================================
+--
+--   BASELINE CHECK
+--     SET STATISTICS IO ON / TIME ON
+--     Run query — note logical reads before indexing
+--
+--   INDEXES CREATED
+--     idx_region          ON SampleSuperstore(Region)
+--     idx_category        ON SampleSuperstore(Category)
+--     idx_region_category ON SampleSuperstore(Region,
+--                            Category) -- composite
+--     idx_state           ON SampleSuperstore(State)
+--     idx_segment         ON SampleSuperstore(Segment)
+--
+--   POST-INDEX CHECK
+--     Rerun same query — compare logical reads drop
+--
+--   VIEW ALL INDEXES
+--     sys.indexes JOIN sys.index_columns
+--     JOIN sys.columns WHERE object_id =
+--     OBJECT_ID('SampleSuperstore')
+--
+--   DROP STATEMENTS (commented out)
+--     DROP INDEX idx_* ON SampleSuperstore
+--
+-- ============================================================
+-- VIEWS QUICK REFERENCE
+-- ============================================================
+--
+--   SELECT * FROM vw_master_eda
+--   SELECT * FROM vw_region_performance
+--   SELECT * FROM vw_subcat_profitability
+--
+-- ============================================================
+-- KEY CONCEPTS USED IN THIS PROJECT
+-- ============================================================
+--
+--   BASICS          SELECT, WHERE, GROUP BY, HAVING,
+--                   ORDER BY, TOP, DISTINCT, AS
+--
+--   AGGREGATES      SUM, AVG, COUNT, MIN, MAX,
+--                   COUNTROWS equivalent
+--
+--   JOINS           INNER JOIN, LEFT JOIN,
+--                   FULL OUTER JOIN, CROSS JOIN
+--
+--   FILTERING       AND, OR, IN, NOT IN, BETWEEN,
+--                   LIKE, IS NULL, IS NOT NULL
+--
+--   STRING FNS      TRIM, UPPER, LOWER, LEN,
+--                   REPLACE, CONCAT, SUBSTRING
+--
+--   NUMBER FNS      ROUND, ABS, CAST, NULLIF,
+--                   DECIMAL precision
+--
+--   DATE FNS        YEAR, MONTH, DAY, DATENAME,
+--                   DATEPART, DATEDIFF, DATEADD,
+--                   GETDATE, FORMAT
+--
+--   CASE WHEN       Single and multi-condition,
+--                   nested, in GROUP BY
+--
+--   SUBQUERIES      In WHERE, SELECT, FROM
+--                   Correlated subqueries
+--
+--   CTEs            Single CTE, chained CTEs,
+--                   CTE used in DELETE
+--
+--   WINDOW FNS      ROW_NUMBER, RANK, DENSE_RANK,
+--                   NTILE, LAG, LEAD,
+--                   PERCENTILE_CONT,
+--                   SUM/AVG OVER (PARTITION BY),
+--                   ROWS BETWEEN UNBOUNDED
+--                   PRECEDING AND CURRENT ROW
+--
+--   PIVOT           Rows to columns, CTE wrapper
+--                   for ROUND outside PIVOT
+--
+--   OBJECTS         CREATE/ALTER/DROP VIEW,
+--                   CREATE PROCEDURE, EXEC,
+--                   OUTPUT parameters,
+--                   CREATE NONCLUSTERED INDEX,
+--                   SET STATISTICS IO/TIME
+--
+--   CLEANING        ROW_NUMBER deduplication,
+--                   NULL handling, CAST,
+--                   string standardisation
+--
+-- ============================================================
+-- END OF INDEX
+-- ============================================================
