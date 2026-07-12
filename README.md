@@ -10,6 +10,11 @@
 
 A full end-to-end business intelligence project built on the **Sample Superstore** retail dataset — covering data ingestion, cleaning, exploratory data analysis, advanced SQL analytics, and an interactive Power BI dashboard. This project mirrors the complete analyst workflow used at top-tier firms: raw data → cleaned data → insights → visualisation → business recommendations.
 
+## Dashboard Preview
+
+![Retail Performance Dashboard](screenshots/dashboard_overview.png)
+
+---
 ---
 
 ## 🎯 Business Questions Answered
@@ -197,6 +202,24 @@ idx_segment         -- on Segment column
 
 ### Drill-Through Page — Detail View
 - Right-click any region → Drill through → full breakdown table + charts for that region only
+
+---
+## Dashboard Gallery
+
+### 1. Dashboard Overview
+![Dashboard Overview](screenshots/dashboard_overview.png)
+
+### 2. Executive Summary
+![Executive Summary](screenshots/dashboard_executive_summary.png)
+
+### 3. Sales Analysis
+![Sales Analysis](screenshots/dashboard_sales.png)
+
+### 4. Customer Segment Analysis
+![Customer Segment Analysis](screenshots/customer_segment_analysis.png)
+
+### 5. Profit Analysis
+![Profit Analysis](screenshots/dashboard_profit.png)
 
 ---
 
