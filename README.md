@@ -206,20 +206,22 @@ idx_segment         -- on Segment column
 ---
 ## Dashboard Gallery
 
-### 1. Dashboard Overview
-![Dashboard Overview](screenshots/dashboard_overview.png)
+### 1. Executive Summary
+![Executive Summary](screenshots/01.dashboard_executive_summary)
 
-### 2. Executive Summary
-![Executive Summary](screenshots/dashboard_executive_summary.png)
+### 2. Sales Analysis
+![Sales Analysis](screenshots/02.dashboard_sales.png)
 
-### 3. Sales Analysis
-![Sales Analysis](screenshots/dashboard_sales.png)
+### 3. Geographic Analysis
+![Geographic Analysis](screenshots/03.geographic_analysis.png)
 
-### 4. Customer Segment Analysis
-![Customer Segment Analysis](screenshots/customer_segment_analysis.png)
+### 4. Profit Analysis
+![Profit Analysis](screenshots/04.Profit_analysis.png)
 
-### 5. Profit Analysis
-![Profit Analysis](screenshots/dashboard_profit.png)
+### 5. Drill-Through Detail
+![Drill-Through Detail](screenshots/05.drill_through_detail.png)
+
+---
 
 ---
 
