@@ -222,7 +222,13 @@ idx_segment         -- on Segment column
 ![Drill-Through Detail](screenshots/05.drill_through_detail.png)
 
 ---
+---
 
+## Power BI Data Model
+
+![Power BI Data Model](screenshots/06_powerbi_data_model.png.png)
+
+---
 ---
 
 ## 📐 DAX Measures (15 core + advanced)
