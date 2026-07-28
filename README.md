@@ -174,25 +174,25 @@ idx_segment         -- on Segment column
 
 **4 pages — all interconnected with slicers and drill-through**
 
-### Page 1 — Executive Summary
+###   — Executive Summary
 - 7 KPI cards: Total Sales, Total Profit, Profit Margin %, Total Orders, Loss Orders, Avg Order Value, Sales YTD
 - Donut chart: Sales by Category
 - Bar chart: Profit by Region
 - Line chart: Monthly Sales Trend
 
-### Page 2 — Sales Analysis
+###   Sales Analysis
 - Clustered column: Sales & Profit by Region
 - Horizontal bar: Top 10 Sub-Categories by Sales
 - Line chart: Monthly Sales Trend by Year (2020–2023)
 - Scatter chart: Sales vs Profit by Sub-Category ← identifies high-sales/low-profit products
 - 100% Stacked bar: Sales % by Segment per Region
 
-### Page 3 — Geographic Analysis
+###   Geographic Analysis
 - Bubble map: Sales by State (bubble size = sales volume)
 - Bar chart: Top 10 States by Profit (red/green conditional formatting)
 - Bar chart: Top 10 Cities by Sales
 
-### Page 4 — Profit Analysis
+###  Profit Analysis
 - 5 slicers: Region, Category, Segment, Year, Discount Bucket
 - Bar chart: Profit by Sub-Category (red = loss, green = profit)
 - Column chart: Profit by Region and Category
