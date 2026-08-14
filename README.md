@@ -7,6 +7,7 @@
 ---
 
 ## 📌 Project Overview
+This project takes raw mortgage records, makes them analytically trustworthy, tests three explicit risk hypotheses, converts those tests into reusable SQL infrastructure, and communicates the resulting decisions through Power BI.
 
 A full end-to-end business intelligence project built on the **Sample Superstore** retail dataset — covering data ingestion, cleaning, exploratory data analysis, advanced SQL analytics, and an interactive Power BI dashboard. This project mirrors the complete analyst workflow used at top-tier firms: raw data → cleaned data → insights → visualisation → business recommendations.
 
