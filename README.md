@@ -1,4 +1,4 @@
-````markdown
+
 # 📊 Sample Superstore — End-to-End Business Intelligence Project
 
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=flat&logo=microsoft-sql-server&logoColor=white)
