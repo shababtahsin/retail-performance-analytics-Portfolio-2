@@ -1,508 +1,824 @@
+
 # 📊 Sample Superstore — Retail Performance Analytics
 
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-SSMS-blue)
 ![Power BI](https://img.shields.io/badge/Power%20BI-Dashboard-yellow)
+![T-SQL](https://img.shields.io/badge/SQL-T--SQL-orange)
 ![Status](https://img.shields.io/badge/Status-Complete-brightgreen)
 
-## Project Overview
+## 📌 Project Overview
 
-This project analyses the **Sample Superstore** retail dataset to understand where sales are coming from, which areas are profitable, where losses are occurring, and how discounting relates to profitability.
+This project analyses retail sales, profitability, discounts, customer segments, and geographic performance using **SQL Server and Power BI**.
 
-The dataset contains **9,994 retail records** covering sales, profit, quantity, discount, customer segment, geography, product category and shipping method.
+The original Sample Superstore dataset contains **9,994 sales records** across 13 columns.
 
-I used **SQL Server** for data validation, exploratory analysis, segmentation and reusable reporting logic, then built a **Power BI report** to present the main findings.
+SQL Server was used for data validation, cleaning, exploratory analysis, calculations, and reusable reporting views. Power BI was used to develop interactive dashboards and present business findings.
 
-The main business problem was simple:
+### 🎯 Business Problem
 
 > **High sales do not always mean strong profitability.**
 
-The analysis therefore focuses on finding the regions, categories, sub-categories and discount levels where revenue is being generated without enough profit.
+The objective was to identify products, regions, customer segments, and discount levels generating revenue without sufficient profit.
 
 ---
 
-## 🎯 Business Questions
+## 🎯 Business Objectives
 
-The project was built around several practical questions:
-
-- Which regions generate the most sales and profit?
-- Which categories and sub-categories perform best?
-- Where is the business losing money?
-- How does discounting relate to profitability?
-- Which customer segments generate the most activity and value?
-- Which states and cities contribute most to performance?
-- Which shipping methods are used most often?
-- Where do high sales hide weak margins?
+| Business Question | Analytical Objective |
+|---|---|
+| Which regions perform best? | Compare regional sales, profit, and margins |
+| Which products generate the most value? | Analyse categories and sub-categories |
+| Where is the business losing money? | Identify loss-making products and transactions |
+| How do discounts relate to profitability? | Compare discounts, profit, and margins |
+| Which customer segments perform best? | Compare Consumer, Corporate, and Home Office |
+| Where is revenue concentrated? | Analyse states, cities, and regions |
+| How are products delivered? | Analyse shipping method distribution |
+| Does higher revenue mean higher profit? | Compare sales against profitability |
 
 ---
 
-## 📊 Dataset
+## 📊 Dataset Overview
 
 **Source:** Sample Superstore public retail dataset
 
+### Verified Original Dataset
+
 | Metric | Value |
 |---|---:|
-| Records | **9,994** |
-| Columns | **13** |
-| Total Sales | **$2.30M** |
-| Total Profit | **$286.40K** |
-| Overall Profit Margin | **12.47%** |
+| Total Records | **9,994** |
+| Total Columns | **13** |
+| Total Sales | **$2,297,200.86** |
+| Total Profit | **$286,397.02** |
+| Profit Margin | **12.47%** |
 | Units Sold | **37,873** |
 | Loss-Making Records | **1,871** |
 | Loss Record Rate | **18.72%** |
 
-### Source Columns
+### Dataset Columns
 
-- Ship Mode
-- Segment
-- Country
-- City
-- State
-- Postal Code
-- Region
-- Category
-- Sub-Category
-- Sales
-- Quantity
-- Discount
-- Profit
+| Column | Description |
+|---|---|
+| Ship Mode | Method used to deliver products |
+| Segment | Customer classification |
+| Country | Country of sale |
+| City | Customer location |
+| State | State of sale |
+| Postal Code | Geographic postal identifier |
+| Region | Sales region |
+| Category | Main product category |
+| Sub-Category | Detailed product classification |
+| Sales | Revenue generated |
+| Quantity | Units sold |
+| Discount | Discount percentage |
+| Profit | Profit or loss generated |
+
+### Dataset and Dashboard Reconciliation
+
+The uploaded CSV and Excel files contain the same 9,994 source records.
+
+The existing Power BI screenshots show a smaller reporting population:
+
+| Metric | Original Dataset | Power BI Screenshot |
+|---|---:|---:|
+| Records / Displayed Orders | 9,994 | 9,746 |
+| Total Sales | $2.30M | $2.27M |
+| Total Profit | $286.40K | $283.51K |
+| Loss-Making Records | 1,871 | 1,845 |
+
+The screenshots therefore reflect a different reporting population from the original source dataset.
+
+The exact transformation responsible for this difference has not been established. SQL findings below use the complete source dataset, while dashboard descriptions retain the displayed Power BI values.
+
+**Important:** The source dataset does not contain a unique Order ID. Record counts should not automatically be treated as distinct customer orders.
 
 ---
 
-## 🧹 Data Validation & Cleaning
+# 🧹 Data Validation and Cleaning
 
-Before analysing the dataset, I checked the source for data-quality problems.
+SQL Server was used to inspect the original dataset before performing analysis.
 
-The main checks included:
+### Data Quality Checks
 
-- checking all 13 columns for missing values
-- reviewing categorical values for consistency
-- inspecting possible duplicate records
-- validating numeric fields such as sales, profit and discount
-- using `TRIM()`, `REPLACE()`, `CAST()` and other SQL functions during cleaning exercises
-- using `NULLIF()` in calculations to protect against divide-by-zero errors
+- **Missing Values:** Checked all 13 columns for missing or NULL values.
+- **Duplicate Records:** Investigated rows containing identical combinations of source attributes.
+- **Data Types:** Validated numeric and text fields before calculations.
+- **Categorical Values:** Reviewed regions, categories, segments, and shipping methods for consistency.
+- **Numeric Validation:** Examined sales, quantity, discounts, and profit for unexpected values.
+- **Text Cleaning:** Practised `TRIM()`, `REPLACE()`, and related functions.
+- **Calculation Safety:** Used `NULLIF()` to prevent division-by-zero errors.
 
 ### Duplicate Handling
 
-The dataset does not contain a reliable transaction or order ID.
+The dataset does not include a reliable unique transaction identifier.
 
-Some rows share the same values across fields such as city, state, category, sales and profit, but this is **not enough evidence to prove that they are duplicate transactions**.
+Although some rows share identical values, matching records cannot automatically be classified as duplicate transactions.
 
-For that reason, the final portfolio findings use the full **9,994-row source population** rather than removing records based on an incomplete duplicate key.
+Therefore, the original **9,994 records were preserved** for the final source-level analysis.
 
-This avoids accidentally deleting legitimate sales records.
+This avoids deleting potentially legitimate transactions.
 
 ---
 
-## ⏱️ Note About Dates
+## ⏱️ Date and Time Analysis
 
-The original dataset used in this project does **not contain order or shipping dates**.
+The original dataset contains no Order Date or Ship Date columns.
 
-Synthetic `Order_Date` and `Ship_Date` fields were created in SQL for practice with:
+Synthetic dates were created for technical exercises involving:
 
-- date functions
-- monthly aggregation
-- quarterly aggregation
+- `YEAR()`, `MONTH()`, and `DAY()`
+- `DATEADD()` and `DATEDIFF()`
+- Monthly and quarterly aggregation
 - `LAG()` and `LEAD()`
-- moving between previous and next periods
-- time-intelligence concepts
+- Running totals
+- Year-to-Date calculations
+- Month-over-Month comparisons
 
-These generated dates are **not real historical transaction dates**.
+**Important:** These dates are artificially generated.
 
-For that reason, monthly trends, YTD calculations, MoM growth and shipping-duration calculations are treated as **technical exercises rather than business findings**.
-
-The main conclusions in this README are based only on the original sales, profit, discount, geography, product and customer data.
-
----
-
-## 🔍 Exploratory Data Analysis
-
-### Sales Analysis
-
-The SQL analysis covered:
-
-- total sales
-- total profit
-- quantity sold
-- average sales per record
-- sales by region
-- sales by category
-- sales by segment
-- sales by shipping method
-- top and bottom states
-- sub-category contribution
-- sales rankings
-- percentage contribution
-- running totals
-
-Window functions were used to rank performance and calculate contribution without losing row-level context.
+Therefore, monthly sales, monthly profit, YTD, MoM, and shipping-duration results demonstrate SQL and Power BI techniques rather than actual historical business performance.
 
 ---
 
-### Profitability Analysis
+# 🔍 SQL Exploratory Data Analysis
 
-The profitability analysis focused on:
+## 1. Sales Analysis
 
-- total profit
-- overall margin
-- loss-making records
-- worst individual losses
-- profit by region
-- profit by category
-- profit by sub-category
-- profit margin by business segment
-- discount bands
-- product groups generating high revenue but weak profit
+Examined overall revenue performance and identified the main sources of sales.
 
-The central theme was to separate **revenue performance from actual profitability**.
+**Analysis included:**
+
+- Total sales and transaction volume
+- Sales by region
+- Sales by category and sub-category
+- Sales by customer segment
+- Sales by shipping method
+- Top and bottom states
+- Product sales rankings
+- Percentage contribution
+- Running totals
+
+**Business Purpose:** Identify which products, customers, and regions generate the most revenue.
 
 ---
 
-### Customer Segment Analysis
+## 2. Profitability Analysis
 
-The three customer segments were compared:
+Examined whether strong sales translated into actual profit.
+
+**Analysis included:**
+
+- Total profit and profit margin
+- Loss-making records
+- Regional profitability
+- Category and sub-category profit
+- Customer segment margins
+- High-revenue, low-profit products
+- Discount bands
+- Products generating negative profit
+
+**Business Purpose:** Identify profitable areas, financial losses, and opportunities for margin improvement.
+
+---
+
+## 3. Customer Segment Analysis
+
+Compared the three customer groups:
 
 - Consumer
 - Corporate
 - Home Office
 
-The analysis looked at:
+**Measures included:**
 
-- number of records
-- sales
-- profit
-- quantity
-- average sales value
-- discount levels
-- margin
+- Total sales
+- Total profit
+- Number of records
+- Quantity sold
+- Average sales per record
+- Average discount
+- Profit margin
 
-Consumer generated the highest overall sales volume, while **Home Office recorded the highest average sales value per record**.
-
----
-
-## 🧮 SQL Techniques Used
-
-The project includes practical use of:
-
-- `GROUP BY`
-- `HAVING`
-- `CASE`
-- joins
-- subqueries
-- CTEs
-- `ROW_NUMBER()`
-- `RANK()`
-- `DENSE_RANK()`
-- `LAG()`
-- `LEAD()`
-- `NTILE()`
-- `PERCENTILE_CONT`
-- `SUM() OVER()`
-- running totals
-- percentage-of-total calculations
-- `PIVOT`
-- `NULLIF()`
-- `CAST()`
-- string functions
-- date functions
-- views
-- stored procedures
-- nonclustered indexes
-
-These techniques were used to answer analytical questions rather than simply demonstrate SQL syntax.
+**Finding:** Consumer generated the highest overall revenue, while Home Office had the highest average sales value per record.
 
 ---
 
-## 🗄️ Reusable SQL Objects
+# 🧮 SQL Techniques Demonstrated
 
-### Views
+| SQL Technique | Analytical Application |
+|---|---|
+| `GROUP BY`, `HAVING` | Aggregation and filtered group analysis |
+| `CASE` | Conditional business classifications |
+| Joins | Combining related datasets |
+| Subqueries | Nested analytical calculations |
+| CTEs | Structuring multi-stage queries |
+| `ROW_NUMBER()` | Ranking and selecting records |
+| `RANK()`, `DENSE_RANK()` | Performance rankings |
+| `LAG()`, `LEAD()` | Previous and next period comparisons |
+| `NTILE()` | Dividing records into analytical groups |
+| `PERCENTILE_CONT` | Distribution and percentile analysis |
+| `SUM() OVER()` | Window aggregations |
+| Running Totals | Cumulative performance |
+| `PIVOT` | Cross-tabular reporting |
+| `NULLIF()` | Safe calculations |
+| `CAST()`, `TRIM()`, `REPLACE()` | Data preparation |
+| Date Functions | Time-based technical exercises |
+| Views | Reusable analytical datasets |
+| Stored Procedures | Parameterised analysis |
+| Indexes | Query-performance optimisation exercises |
+
+---
+
+# 🗄️ Reusable SQL Objects
+
+## SQL Views
 
 | View | Purpose |
 |---|---|
-| `vw_master_eda` | Detailed analytical view combining geography, customer, product and performance measures |
-| `vw_region_performance` | Region-level sales, profit, discount and margin summary |
-| `vw_subcat_profitability` | Sub-category sales, profit, discount and profitability summary |
+| `vw_master_eda` | Combines detailed geographic, customer, product, and performance information |
+| `vw_region_performance` | Summarises regional sales, profit, discounts, and margins |
+| `vw_subcat_profitability` | Summarises sub-category revenue, profit, discounts, and profit status |
 
-### Stored Procedures
+## Stored Procedures
 
-| Procedure | Parameters | Purpose |
-|---|---|---|
-| `usp_sales_by_region` | `@Region` | Returns detailed performance for a selected region |
-| `usp_category_segment_analysis` | `@Category`, `@Segment`, `@TotalProfit OUTPUT` | Analyses a selected category and customer segment |
+| Procedure | Purpose |
+|---|---|
+| `usp_sales_by_region` | Returns performance for a selected region |
+| `usp_category_segment_analysis` | Analyses a selected category and customer segment |
 
-### Indexes
+## Nonclustered Indexes
 
-The project also tests nonclustered indexes on commonly filtered columns:
+The project includes indexing exercises on frequently filtered fields:
 
-```sql
-idx_region
-idx_category
-idx_region_category
-idx_state
-idx_segment
-```
+- `idx_region`
+- `idx_category`
+- `idx_region_category`
+- `idx_state`
+- `idx_segment`
 
-These were included to practise query-performance concepts and indexing strategy.
+These objects demonstrate reusable SQL reporting logic and basic database performance optimisation.
 
 ---
 
-# 💡 Key Findings
+# 💡 Key Business Findings
 
-## 🟢 1. West Was the Strongest Region
+## 1. 🟢 West Was the Strongest Region
 
-West generated approximately:
+| Region | Sales | Profit | Margin |
+|---|---:|---:|---:|
+| West | $725.46K | $108.42K | 14.94% |
+| East | $678.78K | $91.52K | 13.48% |
+| Central | $501.24K | $39.71K | 7.92% |
+| South | $391.72K | $46.75K | 11.93% |
 
-- **$725.46K sales**
-- **$108.42K profit**
+**Finding:** West generated the highest sales and profit, while Central had the weakest profit margin.
 
-This made it the strongest region for both sales and profit.
-
-However, regional sales alone do not explain profitability, so margin and discount behaviour were also considered.
-
----
-
-## 🟠 2. Central Generated Revenue but Weaker Profitability
-
-Central produced approximately:
-
-- **$501.24K sales**
-- **$39.71K profit**
-
-This is substantially less profit than West and East despite generating a meaningful amount of revenue.
-
-The result shows why sales should not be used as the only measure of regional performance.
+**Business Implication:** Regional performance should be assessed through profitability, not revenue alone.
 
 ---
 
-## 🔴 3. Furniture Generated High Sales but Very Little Profit
+## 2. 🔴 Furniture Generated High Sales but Weak Profit
 
-Furniture produced approximately:
+| Category | Sales | Profit | Margin |
+|---|---:|---:|---:|
+| Technology | $836.15K | $145.45K | 17.40% |
+| Furniture | $742.00K | $18.45K | 2.49% |
+| Office Supplies | $719.05K | $122.49K | 17.04% |
 
-- **$742.00K sales**
-- **$18.45K profit**
+Furniture generated substantial revenue but retained very little profit.
 
-That represents a profit margin of only around **2.5%**.
-
-Furniture therefore generated substantial revenue but retained relatively little profit compared with the other categories.
-
----
-
-## 🚨 4. Tables, Bookcases and Supplies Were Loss-Making
-
-Three sub-categories produced negative total profit:
-
-| Sub-Category | Approx. Profit |
-|---|---:|
-| Tables | **-$17.63K** |
-| Bookcases | **-$3.40K** |
-| Supplies | **-$1.22K** |
-
-Tables were the largest loss-making sub-category.
-
-These areas would be reasonable candidates for further investigation into pricing, discount levels, cost structure and product mix.
+**Business Implication:** Review furniture pricing, discount policies, product mix, and cost structure.
 
 ---
 
-## 💸 5. Higher Discounts Were Associated With Lower Profitability
+## 3. 🚨 Three Sub-Categories Were Loss-Making
 
-Profitability deteriorated substantially as discount levels increased.
+| Sub-Category | Sales | Profit | Margin |
+|---|---:|---:|---:|
+| Tables | $206.97K | -$17.73K | -8.56% |
+| Bookcases | $114.88K | -$3.47K | -3.02% |
+| Supplies | $46.67K | -$1.19K | -2.55% |
 
-| Discount Band | Approx. Profit | Margin |
+Tables were the largest loss-making sub-category despite generating more than $200K in sales.
+
+**Business Implication:** Investigate pricing, discounting, and product costs before expanding sales in these categories.
+
+---
+
+## 4. 💸 Higher Discounts Were Associated With Lower Profitability
+
+| Discount Band | Profit | Profit Margin |
 |---|---:|---:|
-| No Discount | **$317.93K** | **29.45%** |
-| 1–20% | **$100.14K** | **12.00%** |
-| 21–40% | **-$35.51K** | **-15.33%** |
-| 41–60% | **-$28.93K** | **-40.74%** |
-| >60% | **-$70.54K** | **-122.62%** |
+| No Discount | $320.99K | 29.50% |
+| 1–20% | $100.79K | 11.91% |
+| 21–40% | -$35.82K | -15.30% |
+| 41–60% | -$28.94K | -40.74% |
+| Above 60% | -$70.61K | -122.63% |
 
-The dataset therefore shows a strong **association between deeper discounts and poorer profitability**.
+Higher discount bands consistently showed weaker profitability.
 
-This does not prove that discounting alone caused the losses, because factors such as product mix and regional behaviour may also contribute.
+Transactions discounted above 60% generated approximately **$70.61K in net losses**.
 
-However, discounting is clearly an area worth reviewing.
+**Business Implication:** Introduce a discount review process and test whether lower discount levels improve margins.
+
+**Analytical Limitation:** The relationship is observational. Product mix, regional differences, and other factors may also influence profitability. The analysis does not establish that discounts alone caused the losses.
 
 ---
 
-## 💻 6. Technology Was the Strongest Category
+## 5. 💻 Technology Was the Strongest Category
 
-Technology generated approximately:
+Technology generated:
 
 - **$836.15K sales**
 - **$145.45K profit**
-- **17.4% profit margin**
+- **17.40% profit margin**
 
-It produced both the highest sales and the highest profit of the three main categories.
+It led all three categories in both sales and profit.
 
-This contrasts strongly with Furniture, which generated substantial sales but a much weaker margin.
+**Business Implication:** Identify successful pricing and product strategies within Technology that may be applicable elsewhere.
 
 ---
 
-## 👥 7. Customer Segments Behaved Differently
+## 6. 👥 Customer Segments Showed Different Performance
 
-Consumer was the largest customer segment:
-
-| Segment | Approx. Sales | Approx. Profit | Avg Sales Value |
+| Segment | Sales | Profit | Average Sales per Record |
 |---|---:|---:|---:|
-| Consumer | **$1.16M** | **$134.12K** | **$223.73** |
-| Corporate | **$706.15K** | **$91.98K** | **$233.82** |
-| Home Office | **$429.65K** | **$60.30K** | **$240.97** |
+| Consumer | $1.16M | $134.12K | $223.73 |
+| Corporate | $706.15K | $91.98K | $233.82 |
+| Home Office | $429.65K | $60.30K | $240.97 |
 
-Consumer generated the highest overall sales and transaction volume.
+Consumer generated the most revenue and the largest number of records.
 
-However, **Home Office had the highest average sales value per record**, followed by Corporate.
+Home Office had the highest average sales value per record.
 
-This shows that the largest customer segment is not necessarily the segment with the highest individual transaction value.
-
----
-
-## 🚚 8. Standard Class Dominated Shipping
-
-Standard Class appeared in **5,968 of the 9,994 records**, representing approximately **59.7%** of the dataset.
-
-It was therefore by far the most commonly used shipping method.
-
-Because the source dataset contains no real shipping dates, the project does not draw operational conclusions about shipping speed.
+**Business Implication:** Customer segments should be evaluated by transaction volume, average value, and profitability together.
 
 ---
 
-# 🎯 Main Business Takeaway
+## 7. 🚚 Standard Class Dominated Shipping
 
-The clearest conclusion from the project is:
+Standard Class appeared in **5,968 records**, accounting for approximately **59.7% of all records**.
 
-> **High sales can hide weak profitability.**
+**Business Implication:** Standard Class is the most frequently used shipping option.
 
-West performed strongly on both sales and profit, while Technology produced the strongest category-level performance.
-
-However, Furniture generated approximately **$742K in sales while producing only $18K in profit**, and several sub-categories were loss-making.
-
-Discount analysis also showed that profitability became progressively weaker as discount levels increased.
-
-The main areas worth reviewing are therefore:
-
-1. **Furniture profitability**
-2. **Tables, Bookcases and Supplies**
-3. **high-discount transactions**
-4. **regional differences in margin**
-5. **customer segments with different volume and value patterns**
+Shipping speed and delivery efficiency cannot be assessed reliably from the original dataset because actual shipping dates were unavailable.
 
 ---
 
-# 📈 Power BI Report
+# 📈 Power BI Dashboard Analysis
 
-The Power BI report turns the SQL analysis into an interactive reporting layer.
+The Power BI report contains **five analytical pages and a data model**.
 
-The report contains four main analytical pages plus a drill-through page.
+The dashboards turn the SQL analysis into interactive reports for reviewing business performance, identifying financial problems, and investigating individual products and locations.
 
 ---
 
-## 1. Executive Summary
+## 📊 1. Executive Summary
 
 ![Executive Summary](screenshots/01.dashboard_executive_summary)
 
-The executive page presents the main KPIs and provides a high-level view of retail performance.
+### Purpose
 
-It includes measures such as:
+Provides management with a high-level overview of revenue, profit, transactions, and regional performance.
 
-- total sales
-- total profit
-- profit margin
-- sales by category
-- regional performance
-- customer activity
-- loss-making records
+### Dashboard Visuals
+
+**1. KPI Cards**
+
+The dashboard displays:
+
+- **Total Sales:** $2.27M
+- **Total Profit:** $283.51K
+- **Profit Margin:** Approximately 12%
+- **Displayed Total Orders:** 9,746
+- **Loss Orders:** 1,845
+- **Average Order Value:** $233.34
+- **Sales YTD:** $578.16K
+
+These indicators summarise overall business performance and highlight the number of loss-making records.
+
+**2. Sales by Category — Donut Chart**
+
+Compares revenue contribution across the three main categories:
+
+- Technology: $830.78K — 36.53%
+- Furniture: $732.82K — 32.22%
+- Office Supplies: $710.55K — 31.24%
+
+Technology generates the largest share of revenue, although the three categories contribute relatively similar amounts.
+
+**3. Profit by Region — Horizontal Bar Chart**
+
+Ranks regional profitability:
+
+- West: approximately $106K
+- East: approximately $91K
+- South: approximately $47K
+- Central: approximately $40K
+
+West produces the most profit, while Central contributes considerably less.
+
+**4. Monthly Sales — Line Chart**
+
+Displays monthly revenue using the synthetic date fields.
+
+July records approximately $220K, while February records approximately $156K.
+
+The visual demonstrates monthly comparison and time-based DAX calculations, rather than actual historical seasonality.
+
+### 💡 Business Insight
+
+**Revenue and profit do not increase equally across every category and region.** Management should investigate areas generating substantial sales but relatively weak profits.
 
 ---
 
-## 2. Sales Analysis
+## 📈 2. Sales Analysis
 
 ![Sales Analysis](screenshots/02.dashboard_sales.png)
 
-The Sales Analysis page compares revenue and profit across different parts of the business.
+### Purpose
 
-It includes analysis by:
+Identifies where revenue originates and compares sales performance with profitability across regions, products, and customer segments.
 
-- region
-- category
-- sub-category
-- customer segment
+### Dashboard Visuals
 
-The page makes it easier to identify areas where high sales do not translate into equally strong profit.
+**1. Sales and Profit by Region — Clustered Column Chart**
+
+Compares sales and profit for West, East, Central, and South.
+
+West leads in both measures, while Central generates more sales than South but less profit.
+
+This reveals differences in how efficiently each region converts sales into profit.
+
+**2. Sales by Sub-Category — Horizontal Bar Chart**
+
+Ranks individual product groups by revenue.
+
+Phones and Chairs generate the highest sales, followed by Storage, Tables, and Binders.
+
+The chart identifies major revenue drivers and highlights products requiring further profitability analysis.
+
+**3. Sales by Region and Customer Segment — 100% Stacked Bar Chart**
+
+Compares the percentage of revenue contributed by each customer segment.
+
+Across all four regions:
+
+- Consumer contributes approximately 50%.
+- Corporate contributes approximately 30–31%.
+- Home Office contributes approximately 18–19%.
+
+The similar distribution suggests that customer segment composition is relatively consistent between regions.
+
+**4. Monthly Sales by Year — Multi-Line Chart**
+
+Compares monthly sales across the synthetic years 2020–2023.
+
+This demonstrates multi-year trend visualisation and time-based reporting.
+
+**5. Sales vs Profit by Sub-Category — Scatter Plot**
+
+Plots Total Sales on the horizontal axis and Total Profit on the vertical axis.
+
+The chart identifies different commercial performance patterns:
+
+- **Phones and Copiers:** Strong revenue with healthy profits.
+- **Chairs:** High sales but comparatively weaker profit.
+- **Tables:** Significant revenue combined with negative profit.
+- **Paper and other smaller categories:** Lower revenue with positive profit contributions.
+
+Tables stand out as a major concern because substantial revenue is associated with financial losses.
+
+### 💡 Business Insight
+
+**The best-selling products are not necessarily the most profitable.** The scatter plot helps identify product groups where revenue growth may not translate into business value.
 
 ---
 
-## 3. Geographic Analysis
+## 🌎 3. Geographic Analysis
 
 ![Geographic Analysis](screenshots/03.geographic_analysis.png)
 
-The geographic page compares retail performance across US states and cities.
+### Purpose
 
-It includes:
+Examines how sales and profit vary across US states, cities, and regions.
 
-- state-level sales
-- state-level profit
-- top-performing locations
-- city-level contribution
+### Geographic Analysis
+
+**1. State-Level Sales**
+
+Compares revenue generated across individual states.
+
+This helps identify major geographic markets and areas contributing smaller amounts of revenue.
+
+**2. State-Level Profit**
+
+Compares profitability between states.
+
+This allows analysts to identify locations where strong sales may be accompanied by weak or negative profit.
+
+**3. Top-Performing Locations**
+
+Ranks locations according to their contribution to overall business performance.
+
+This supports geographic prioritisation and market comparisons.
+
+**4. City-Level Contribution**
+
+Provides more detailed geographic analysis by examining individual cities.
+
+This helps identify whether sales and profit are concentrated in a small number of locations.
+
+### 💡 Business Insight
+
+**Strong geographic sales do not guarantee strong geographic profitability.** Comparing state and city performance can help identify markets requiring pricing, product mix, or operational reviews.
 
 ---
 
-## 4. Profit Analysis
+## 💰 4. Profit Analysis
 
 ![Profit Analysis](screenshots/04.Profit_analysis.png)
 
-The Profit Analysis page focuses on:
+### Purpose
 
-- profit by sub-category
-- profit by region
-- category profitability
-- discounts
-- loss-making areas
+Investigates product profitability, regional differences, discount levels, and loss-making areas.
 
-Filters allow results to be explored by region, category, segment and discount level.
+### Dashboard Visuals
+
+**1. Interactive Slicers**
+
+The dashboard supports filtering by:
+
+- Region
+- Product Category
+- Customer Segment
+- Order Year
+- Discount Bucket
+
+Discount buckets include No Discount, Low, Medium, High, and Extreme.
+
+These controls allow users to investigate profitability under different business conditions.
+
+**2. Profit by Sub-Category — Horizontal Bar Chart**
+
+Ranks product groups by profit.
+
+Copiers, Phones, and Accessories are among the strongest contributors.
+
+Tables, Bookcases, and Supplies are loss-making in the complete source dataset.
+
+This identifies which product groups create or reduce profitability.
+
+**3. Profit by Region and Category — Clustered Column Chart**
+
+Compares Furniture, Office Supplies, and Technology profitability across regions.
+
+Technology and Office Supplies contribute strongly in several regions.
+
+Central's Furniture category shows approximately $3K in losses in the displayed report.
+
+This helps identify the categories responsible for regional profit differences.
+
+**4. Sub-Category Profitability — Detailed Table**
+
+Displays:
+
+- Sub-Category
+- Total Sales
+- Profit Margin %
+- Average Discount %
+
+The table allows direct comparison between revenue, profitability, and discount behaviour.
+
+For example, the displayed report shows Tables generating approximately $205K in sales with a negative profit margin of around 8% and an average discount of approximately 26%.
+
+This makes Tables a clear candidate for further pricing and cost analysis.
+
+**5. Monthly Profit by Year — Multi-Line Chart**
+
+Compares monthly profitability across synthetic years.
+
+It demonstrates multi-year profit analysis and time-intelligence reporting.
+
+**6. Interactive Bookmark Buttons**
+
+Three visible buttons provide predefined reporting views:
+
+- All Regions
+- West Region
+- Loss Orders
+
+These simplify navigation between different analytical scenarios.
+
+### 💡 Business Insight
+
+**Furniture and high-discount products require further investigation.** Comparing revenue, margin, and discounts helps identify where profitability may be improved.
 
 ---
 
-## 5. Drill-Through Detail
+## 🔎 5. Drill-Through Detail
 
 ![Drill-Through Detail](screenshots/05.drill_through_detail.png)
 
-The drill-through page allows a selected region to be examined in more detail.
+### Purpose
 
-This helps move from a high-level KPI into the underlying regional performance.
+Allows users to move from summary-level reporting into detailed geographic and product performance.
+
+### Dashboard Visuals
+
+**1. KPI Cards**
+
+The displayed drill-through context shows:
+
+- **Total Sales:** $669.35K
+- **Total Profit:** $90.83K
+- **Profit Margin:** Approximately 14%
+
+These figures summarise the selected reporting context.
+
+**2. Detailed Performance Table**
+
+Displays:
+
+- State
+- Category
+- Sub-Category
+- Total Sales
+- Total Profit
+- Profit Margin %
+- Average Discount %
+
+This allows detailed investigation of product performance within individual locations.
+
+For example, the displayed Connecticut Furniture–Tables row contains approximately:
+
+- Sales: $252.36
+- Profit: -$19.61
+- Profit Margin: -8%
+- Average Discount: 30%
+
+This provides a practical example of a loss-making product group within a specific state.
+
+**3. Sales by Sub-Category — Horizontal Bar Chart**
+
+Ranks sub-categories within the selected reporting context.
+
+Phones, Chairs, Storage, and Machines are among the leading revenue contributors in the screenshot.
+
+The chart helps identify which products drive sales within a selected area.
+
+**4. Drill-Through Functionality**
+
+Users can investigate a selected region in greater detail while retaining the relevant filter context.
+
+This connects high-level reporting with more detailed business analysis.
+
+### 💡 Business Insight
+
+**Drill-through reporting helps locate the products and geographic areas behind performance problems.** It makes the dashboard more useful for investigation and decision-making.
 
 ---
 
-## Power BI Data Model
+# 🗄️ Power BI Data Model
 
 ![Power BI Data Model](screenshots/06_powerbi_data_model.png.png)
 
-The Power BI model organises the data and measures used across the report so that filtering and calculations remain consistent between pages.
+### Model Overview
+
+The Power BI model integrates the retail transaction dataset with reusable SQL analytical views.
+
+Four tables are visible in the model.
+
+| Table / View | Purpose |
+|---|---|
+| `SampleSuperstore` | Main transaction-level sales and profit dataset |
+| `vw_master_eda` | Detailed analytical information and calculated fields |
+| `vw_region_performance` | Regional performance summary |
+| `vw_subcat_profitability` | Sub-category profitability summary |
+
+### 1. SampleSuperstore
+
+Contains the original retail information and supporting reporting fields.
+
+Includes:
+
+- Geography
+- Customer segment
+- Product category
+- Sales and profit
+- Discount and quantity
+- Synthetic date fields
+
+**Purpose:** Provides detailed data for measures, filters, and report visuals.
+
+### 2. vw_master_eda
+
+Provides reusable analytical fields prepared through SQL.
+
+Visible fields include:
+
+- Average discount
+- Average sales value
+- Average shipping days
+- Loss orders
+- Geographic information
+- Category information
+- Date components
+
+**Purpose:** Supports detailed exploratory reporting and reusable calculations.
+
+### 3. vw_region_performance
+
+Contains regional performance measures, including:
+
+- Total sales
+- Total profit
+- Total orders
+- Average discount
+- Profit margin
+
+**Purpose:** Supports regional comparisons without repeatedly rebuilding the same aggregations.
+
+### 4. vw_subcat_profitability
+
+Contains product profitability measures, including:
+
+- Category
+- Sub-Category
+- Total sales
+- Total profit
+- Profit margin
+- Average discount
+- Profit status
+
+**Purpose:** Supports product rankings, profitability comparisons, and discount analysis.
+
+### Relationships
+
+The model contains one-to-many relationships between analytical views and transaction-level information.
+
+These relationships support filtering and calculations across report visuals.
+
+The current implementation combines transaction data with SQL reporting views rather than using a conventional dimensional star schema.
+
+A future production implementation could separate reusable dimensions such as Geography, Product, and Date from the central sales fact table.
+
+### 💡 Technical Insight
+
+**SQL Server prepares reusable analytical information, while Power BI provides the data model, DAX calculations, filters, and interactive reporting.**
 
 ---
 
-## 📐 Power BI Measures
+# 📐 DAX Measures
 
-The report includes measures for areas such as:
+The Power BI report includes measures covering sales, profitability, transactions, discounts, and regional contribution.
 
-```text
-Total Sales
-Total Profit
-Total Orders
-Total Quantity
-Profit Margin %
-Avg Order Value
-Avg Discount %
-Loss Orders
-Profitable Orders
-Loss Order %
-Total Loss Amount
-Revenue After Discount
-Profit Per Unit
-Consumer Profit
-High Discount Loss
-Sales % of All Regions
-Sales Ignoring Region Filter
-```
+| Measure | Purpose |
+|---|---|
+| Total Sales | Calculates total revenue |
+| Total Profit | Calculates total profit |
+| Total Orders | Counts records using the model's reporting definition |
+| Total Quantity | Calculates units sold |
+| Profit Margin % | Measures profit relative to revenue |
+| Avg Order Value | Calculates average revenue per displayed order |
+| Avg Discount % | Calculates average discount |
+| Loss Orders | Counts loss-making records |
+| Profitable Orders | Counts profitable records |
+| Loss Order % | Measures the proportion of loss-making records |
+| Total Loss Amount | Calculates losses from negative-profit records |
+| Revenue After Discount | Provides discount-adjusted revenue analysis |
+| Profit Per Unit | Measures profit per item sold |
+| Consumer Profit | Calculates profit from Consumer customers |
+| High Discount Loss | Analyses losses associated with high discounts |
+| Sales % of All Regions | Calculates regional sales contribution |
+| Sales Ignoring Region Filter | Provides comparison against unfiltered regional sales |
 
-Additional time-intelligence measures were created using the synthetic date fields for technical practice, but they are not used as evidence for the main business conclusions.
+Additional measures demonstrate time intelligence using the synthetic date fields.
+
+**Note:** Synthetic-date calculations are technical exercises rather than verified historical performance measures.
+
+---
+
+# 🎯 Business Recommendations
+
+Based on the verified source data, the following areas deserve management attention.
+
+| Priority | Area | Recommended Action |
+|---|---|---|
+| 1 | Furniture Profitability | Review pricing, costs, and product mix |
+| 2 | Tables | Investigate the largest loss-making sub-category |
+| 3 | Discount Policy | Evaluate margins before approving deeper discounts |
+| 4 | Central Region | Investigate weak profitability and category performance |
+| 5 | Bookcases and Supplies | Review recurring loss-making product groups |
+| 6 | Technology | Study profitable product and pricing strategies |
+| 7 | Customer Segments | Compare transaction value, margins, and volume |
+
+### Potential Improvement Opportunity
+
+High-discount transactions are an important area for further investigation.
+
+A controlled discount-cap scenario could be modelled to estimate potential margin improvements.
+
+However, any estimated financial recovery would be **scenario-based**, not a realised saving, and would require assumptions about customer demand, pricing, and sales volume.
 
 ---
 
@@ -536,43 +852,58 @@ retail-performance-analytics-Portfolio-2/
 
 ---
 
-# 🛠️ Tools
+# 🛠️ Tools and Technologies
 
-| Tool | Use |
+| Tool | Application |
 |---|---|
-| **SQL Server / SSMS** | Data validation, EDA and analytical queries |
-| **T-SQL** | Aggregations, CTEs, windows, subqueries, views, procedures and indexes |
-| **Power BI Desktop** | Data model, DAX measures and dashboard development |
-| **DAX** | KPI and reporting calculations |
+| SQL Server | Data storage, validation, and analysis |
+| SSMS | SQL query development and execution |
+| T-SQL | Aggregations, CTEs, window functions, views, and procedures |
+| Power BI Desktop | Dashboard development and reporting |
+| Power Query | Data preparation and transformation |
+| DAX | KPI calculations and analytical measures |
+| GitHub | Source code, documentation, and portfolio presentation |
 
 ---
 
 # 🧠 Skills Demonstrated
 
-This project demonstrates practical use of:
+### SQL and Database Development
 
-**SQL Analysis**  
-`GROUP BY` · CTEs · Subqueries · Joins · Window Functions · PIVOT · Stored Procedures · Views · Indexes
+`Data Validation` · `Data Cleaning` · `GROUP BY` · `CTEs` · `Subqueries` · `Window Functions` · `PIVOT` · `Views` · `Stored Procedures` · `Indexes`
 
-**Business Analysis**  
-Sales Analysis · Profitability Analysis · Discount Analysis · Segmentation · Geographic Analysis · KPI Design
+### Data and Business Analysis
 
-**Power BI**  
-Data Modelling · DAX · Slicers · Drill-Through · Bookmarks · Interactive Reporting
+`Exploratory Data Analysis` · `Sales Analysis` · `Profitability Analysis` · `Discount Analysis` · `Customer Segmentation` · `Geographic Analysis` · `Business Recommendations`
+
+### Power BI and Reporting
+
+`Data Modelling` · `DAX` · `KPI Development` · `Interactive Dashboards` · `Slicers` · `Bookmarks` · `Drill-Through` · `Scatter Plots` · `Data Visualisation`
 
 ---
 
 # 📌 Overall Conclusion
 
-The project found that the business generated approximately **$2.30M in sales and $286K in profit**, but performance varied substantially underneath those headline numbers.
+The original Sample Superstore dataset generated approximately **$2.30M in revenue and $286.40K in profit**, with an overall profit margin of **12.47%**.
 
-The strongest areas were **West and Technology**, while Furniture produced high revenue with a very weak margin.
+However, the analysis revealed important differences beneath these headline figures.
 
-Tables, Bookcases and Supplies were loss-making, and deeper discount bands were associated with increasingly poor profitability.
+- **West** generated the highest regional sales and profit.
+- **Technology** was the strongest category for both revenue and profitability.
+- **Furniture** generated approximately $742K in sales but only $18.45K in profit.
+- **Tables, Bookcases, and Supplies** generated net losses.
+- **Higher discount levels** were associated with significantly weaker margins.
+- **Consumer** was the largest customer segment, while Home Office had the highest average sales per record.
 
-The main lesson from the project is that a retail business should not evaluate performance using revenue alone.
+The Power BI dashboards translate these findings into interactive reports, allowing users to explore regional performance, product profitability, geographic differences, and individual reporting details.
 
-**Sales, profit, margin, discounting and product mix need to be analysed together to understand where the business is actually creating value.**
+### Final Business Takeaway
+
+> **Revenue growth is valuable only when it supports sustainable profitability.**
+
+Retail businesses should evaluate sales, profit margins, discounts, product mix, and geographic performance together before making commercial decisions.
+
+This project demonstrates an end-to-end analytical workflow using **SQL Server, T-SQL, DAX, and Power BI** to turn retail data into actionable business information.
 
 ---
 
@@ -581,4 +912,5 @@ The main lesson from the project is that a retail business should not evaluate p
 **Shah Tahsin**  
 Business Data Analyst | SQL · Power BI · Python
 
-[GitHub](https://github.com/shababtahsin)
+[GitHub Portfolio](https://github.com/shababtahsin)  
+[LinkedIn](https://www.linkedin.com/in/shah-tahsin/)
