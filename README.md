@@ -695,6 +695,37 @@ Four tables are visible in the model.
 | `vw_region_performance` | Regional performance summary |
 | `vw_subcat_profitability` | Sub-category profitability summary |
 
+
+
+## 📊 Power BI Report Conclusion
+
+The five-page Power BI report transforms retail data into interactive business insights, showing where revenue is generated, which products are profitable, and where financial losses occur.
+
+### 🔍 Key Findings
+
+- **Executive Summary:** Reports $2.27M in sales, $283.51K in profit, and approximately 12% profit margin.
+- **Sales Analysis:** Identifies Technology as the leading revenue category and reveals high-selling products with weak profitability.
+- **Geographic Analysis:** Compares regional, state, and city performance to identify strong and underperforming markets.
+- **Profit Analysis:** Highlights loss-making sub-categories, particularly Tables, and the relationship between higher discounts and weaker margins.
+- **Drill-Through Analysis:** Enables detailed investigation of product and geographic performance behind the headline KPIs.
+- **Data Model:** Combines SQL analytical views, relationships, and DAX measures to support interactive reporting.
+
+### 🎯 Business Value & Recommendations
+
+| Finding | Business Recommendation |
+|---|---|
+| Furniture generates high sales but weak profits | Review product pricing, costs, and margins |
+| Tables are loss-making | Investigate discounts and product profitability |
+| Higher discounts are associated with lower margins | Evaluate discount limits and approval policies |
+| Central shows weaker regional profitability | Investigate product mix and regional pricing |
+| Technology generates strong profits | Identify successful strategies worth expanding |
+| Profitability varies geographically | Prioritise detailed regional and state-level analysis |
+
+### 🚀 Final Takeaway
+
+> **High revenue does not guarantee strong profitability. Sustainable growth requires businesses to understand where they make money, where they lose money, and why.**
+
+By combining **SQL Server, DAX, and Power BI**, this project demonstrates how retail data can be transformed into actionable insights to support better pricing, product management, regional performance, and commercial decision-making.
 ### 1. SampleSuperstore
 
 Contains the original retail information and supporting reporting fields.
