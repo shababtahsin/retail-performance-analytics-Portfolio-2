@@ -1,4 +1,3 @@
-
 # 📊 Sample Superstore — Retail Performance Analytics
 
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-SSMS-blue)
@@ -695,37 +694,6 @@ Four tables are visible in the model.
 | `vw_region_performance` | Regional performance summary |
 | `vw_subcat_profitability` | Sub-category profitability summary |
 
-
-
-## 📊 Power BI Report Conclusion
-
-The five-page Power BI report transforms retail data into interactive business insights, showing where revenue is generated, which products are profitable, and where financial losses occur.
-
-### 🔍 Key Findings
-
-- **Executive Summary:** Reports $2.27M in sales, $283.51K in profit, and approximately 12% profit margin.
-- **Sales Analysis:** Identifies Technology as the leading revenue category and reveals high-selling products with weak profitability.
-- **Geographic Analysis:** Compares regional, state, and city performance to identify strong and underperforming markets.
-- **Profit Analysis:** Highlights loss-making sub-categories, particularly Tables, and the relationship between higher discounts and weaker margins.
-- **Drill-Through Analysis:** Enables detailed investigation of product and geographic performance behind the headline KPIs.
-- **Data Model:** Combines SQL analytical views, relationships, and DAX measures to support interactive reporting.
-
-### 🎯 Business Value & Recommendations
-
-| Finding | Business Recommendation |
-|---|---|
-| Furniture generates high sales but weak profits | Review product pricing, costs, and margins |
-| Tables are loss-making | Investigate discounts and product profitability |
-| Higher discounts are associated with lower margins | Evaluate discount limits and approval policies |
-| Central shows weaker regional profitability | Investigate product mix and regional pricing |
-| Technology generates strong profits | Identify successful strategies worth expanding |
-| Profitability varies geographically | Prioritise detailed regional and state-level analysis |
-
-### 🚀 Final Takeaway
-
-> **High revenue does not guarantee strong profitability. Sustainable growth requires businesses to understand where they make money, where they lose money, and why.**
-
-By combining **SQL Server, DAX, and Power BI**, this project demonstrates how retail data can be transformed into actionable insights to support better pricing, product management, regional performance, and commercial decision-making.
 ### 1. SampleSuperstore
 
 Contains the original retail information and supporting reporting fields.
@@ -829,119 +797,6 @@ Additional measures demonstrate time intelligence using the synthetic date field
 
 ---
 
-# 🎯 Business Recommendations
+## 📊 Power BI Report Conclusion
 
-Based on the verified source data, the following areas deserve management attention.
-
-| Priority | Area | Recommended Action |
-|---|---|---|
-| 1 | Furniture Profitability | Review pricing, costs, and product mix |
-| 2 | Tables | Investigate the largest loss-making sub-category |
-| 3 | Discount Policy | Evaluate margins before approving deeper discounts |
-| 4 | Central Region | Investigate weak profitability and category performance |
-| 5 | Bookcases and Supplies | Review recurring loss-making product groups |
-| 6 | Technology | Study profitable product and pricing strategies |
-| 7 | Customer Segments | Compare transaction value, margins, and volume |
-
-### Potential Improvement Opportunity
-
-High-discount transactions are an important area for further investigation.
-
-A controlled discount-cap scenario could be modelled to estimate potential margin improvements.
-
-However, any estimated financial recovery would be **scenario-based**, not a realised saving, and would require assumptions about customer demand, pricing, and sales volume.
-
----
-
-# 📁 Repository Structure
-
-```text
-retail-performance-analytics-Portfolio-2/
-│
-├── README.md
-├── INDEX.sql
-├── LICENSE
-├── .gitignore.txt
-│
-├── data/
-│   └── SampleSuperstore.csv
-│
-├── sql/
-│   └── retail_performance_analysis.sql
-│
-├── powerbi/
-│   └── retail_dashboard.pbix
-│
-└── screenshots/
-    ├── 01.dashboard_executive_summary
-    ├── 02.dashboard_sales.png
-    ├── 03.geographic_analysis.png
-    ├── 04.Profit_analysis.png
-    ├── 05.drill_through_detail.png
-    └── 06_powerbi_data_model.png.png
-```
-
----
-
-# 🛠️ Tools and Technologies
-
-| Tool | Application |
-|---|---|
-| SQL Server | Data storage, validation, and analysis |
-| SSMS | SQL query development and execution |
-| T-SQL | Aggregations, CTEs, window functions, views, and procedures |
-| Power BI Desktop | Dashboard development and reporting |
-| Power Query | Data preparation and transformation |
-| DAX | KPI calculations and analytical measures |
-| GitHub | Source code, documentation, and portfolio presentation |
-
----
-
-# 🧠 Skills Demonstrated
-
-### SQL and Database Development
-
-`Data Validation` · `Data Cleaning` · `GROUP BY` · `CTEs` · `Subqueries` · `Window Functions` · `PIVOT` · `Views` · `Stored Procedures` · `Indexes`
-
-### Data and Business Analysis
-
-`Exploratory Data Analysis` · `Sales Analysis` · `Profitability Analysis` · `Discount Analysis` · `Customer Segmentation` · `Geographic Analysis` · `Business Recommendations`
-
-### Power BI and Reporting
-
-`Data Modelling` · `DAX` · `KPI Development` · `Interactive Dashboards` · `Slicers` · `Bookmarks` · `Drill-Through` · `Scatter Plots` · `Data Visualisation`
-
----
-
-# 📌 Overall Conclusion
-
-The original Sample Superstore dataset generated approximately **$2.30M in revenue and $286.40K in profit**, with an overall profit margin of **12.47%**.
-
-However, the analysis revealed important differences beneath these headline figures.
-
-- **West** generated the highest regional sales and profit.
-- **Technology** was the strongest category for both revenue and profitability.
-- **Furniture** generated approximately $742K in sales but only $18.45K in profit.
-- **Tables, Bookcases, and Supplies** generated net losses.
-- **Higher discount levels** were associated with significantly weaker margins.
-- **Consumer** was the largest customer segment, while Home Office had the highest average sales per record.
-
-The Power BI dashboards translate these findings into interactive reports, allowing users to explore regional performance, product profitability, geographic differences, and individual reporting details.
-
-### Final Business Takeaway
-
-> **Revenue growth is valuable only when it supports sustainable profitability.**
-
-Retail businesses should evaluate sales, profit margins, discounts, product mix, and geographic performance together before making commercial decisions.
-
-This project demonstrates an end-to-end analytical workflow using **SQL Server, T-SQL, DAX, and Power BI** to turn retail data into actionable business information.
-
----
-
-## 👤 Author
-
-**Shah Tahsin**  
-Business Data Analyst | SQL · Power BI · Python
-
-[GitHub Portfolio](https://github.com/shababtahsin)  
-[LinkedIn](https://www.linkedin.com/in/shah-tahsin/)
+The five-page Power BI report transforms retail data
